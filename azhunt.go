@@ -24,6 +24,31 @@ const banner = `
       by haxxm0nkey (haxx.it)
 `
 
+const usage = `
+azhunt is a tool for enumerating Azure AD (Entra ID) domains and tenant information.
+
+Usage:
+  azhunt [flags]
+
+INPUT:
+   -d                  domain to find information about
+   -l file             file containing list of domains
+
+MODE:
+   -domains            find related domains only
+   -tenant             find tenant information only
+
+OUTPUT:
+   -silent             display only domain results in the output
+   -j                  display output in JSON format
+   -o file             file to write output
+
+EXAMPLES:
+   azhunt -d example.com
+   azhunt -l /tmp/domains.txt -j
+   echo "example.com" | azhunt -silent
+`
+
 // CombinedTenantInfo represents the structure for combined domain and tenant information output in JSON.
 type CombinedTenantInfo struct {
 	RootDomain        string   `json:"root_domain"`
@@ -94,6 +119,14 @@ type FederationResponse struct {
 func printBanner() {
 	fmt.Print(banner)
 	fmt.Println("\nProgram exiting: no input provided.")
+}
+
+// customUseage displays custom help message
+func customUsage() {
+	fmt.Printf(banner)
+	fmt.Println()
+	fmt.Print(usage)
+	fmt.Println()
 }
 
 // readDomainsFromStdin reads domain names from standard input.
@@ -530,6 +563,9 @@ func handleCheck(domain string, domainsOnly bool, tenantOnly bool, silent bool, 
 }
 
 func main() {
+	// Override the default usage function with the custom one
+	flag.Usage = customUsage
+
 	// Define flags
 	var domain string
 	var domainsList string
